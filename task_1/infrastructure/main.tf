@@ -27,3 +27,13 @@ module "vpc" {
   availability_zones   = ["us-east-1a", "us-east-1b"]
 }
 
+module "routing" {
+  source = "./modules/routing"
+
+  vpc_id              = module.vpc.vpc_id
+  internet_gateway_id = module.vpc.internet_gateway_id
+  public_subnet_ids   = module.vpc.public_subnet_ids
+  private_subnet_ids  = module.vpc.private_subnet_ids
+
+  enable_nat = false
+}
