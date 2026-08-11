@@ -12,4 +12,14 @@ variable "private_subnet_cidrs" {
 
 variable "availability_zones" {
   type = list(string)
-}   
+}
+
+variable "enable_dns_hostnames" {
+  type    = bool
+  default = false
+}
+
+variable "enable_dns_support" {
+  type    = bool
+  default = false
+}

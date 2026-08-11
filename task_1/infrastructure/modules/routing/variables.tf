@@ -14,6 +14,11 @@ variable "private_subnet_ids" {
   type = list(string)
 }
 
+variable "destination_cidr_block" {
+  type    = string
+  default = "0.0.0.0/0"
+}
+
 variable "enable_nat" {
   type    = bool
   default = false
