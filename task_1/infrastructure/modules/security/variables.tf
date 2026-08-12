@@ -12,12 +12,12 @@ variable "vpc_id" {
 
 variable "rules" {
   type = map(object({
-    traffic_type = optional(string, "ingress")
-    rule_description = optional(string, "")
+    traffic_type             = optional(string, "ingress")
+    rule_description         = optional(string, "")
     source_security_group_id = optional(string)
-    source_cidr_blocks = optional(list(string))
-    port_range_start = number
-    port_range_end = number
-    protocol_name = optional(string, "tcp")
+    source_cidr_blocks       = optional(list(string))
+    port_range_start         = number
+    port_range_end           = number
+    protocol_name            = optional(string, "tcp")
   }))
 }
