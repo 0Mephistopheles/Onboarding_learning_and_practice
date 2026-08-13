@@ -12,5 +12,6 @@ resource "aws_instance" "instance_ec2" {
     volume_type = var.instance_volume.volume_type
     iops        = var.instance_volume.volume_iops
     throughput  = var.instance_volume.volume_throughput
+    delete_on_termination = var.instance_volume.deletion_policy
   }
 }

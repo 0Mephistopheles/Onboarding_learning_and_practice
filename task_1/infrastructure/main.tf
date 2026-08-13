@@ -79,7 +79,7 @@ module "asg_security" {
   }
 }
 
-module "rds_security" {
+module "database_security" {
   source = "./modules/security"
   name = "database-sg"
   description = "Database instances security group"
@@ -94,5 +94,25 @@ module "rds_security" {
       port_range_end = 22
       protocol_name = "tcp"
     }
+  }
+}
+
+module "bastion_instance" {
+  source = "./modules/ec2_instance"
+
+  subnet_id = module.vpc.public_subnet_ids[0]
+  security_group_ids = [module.bastion_security.security_group_id]
+  associate_public_ip_address = true
+  instance_key = "dev_key"
+
+  instance_system_type = {
+    ami_image_type = "ami-0bdc7d025135d7b49"
+    instance_type = "t3.micro"
+  }
+
+  instance_volume = {
+    volume_type = "gp3"
+    volume_size = 8
+    deletion_policy = true
   }
 }
