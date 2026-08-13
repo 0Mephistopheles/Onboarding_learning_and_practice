@@ -27,6 +27,7 @@ variable "db_user" {
     user_name     = optional(string, "admin")
     user_password = string
   })
+  sensitive = true
 }
 
 variable "db_port" {

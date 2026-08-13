@@ -5,7 +5,7 @@ resource "aws_security_group" "guard" {
 }
 
 resource "aws_security_group_rule" "traffic_rules" {
-  security_group_id = awws_security_group.guard.id
+  security_group_id = aws_security_group.guard.id
   for_each          = var.rules
 
   type                     = each.value.traffic_type

@@ -15,9 +15,9 @@ resource "aws_db_instance" "database" {
   username = var.db_user.user_name
   password = var.db_user.user_password
 
-  port                  = var.db_port
-  multi_az              = var.is_multi_az
-  publicly_accessible   = var.public_access
-  db_subnet_group_name  = aws_db_subnet_group.database.name
+  port                   = var.db_port
+  multi_az               = var.is_multi_az
+  publicly_accessible    = var.public_access
+  db_subnet_group_name   = aws_db_subnet_group.database.name
   vpc_security_group_ids = var.vpc_security_groups
 }
