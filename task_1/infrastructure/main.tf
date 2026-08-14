@@ -104,12 +104,12 @@ module "database_security" {
   vpc_id      = module.vpc.vpc_id
 
   rules = {
-    ssh = {
-      description              = "ssh conection from bastion"
+    postgres = {
+      description              = "postgres conection from asg"
       traffic_type             = "ingress"
-      source_security_group_id = module.bastion_security.security_group_id
-      port_range_start         = 22
-      port_range_end           = 22
+      source_security_group_id = module.asg_security.security_group_id
+      port_range_start         = 5432
+      port_range_end           = 5432
       protocol_name            = "tcp"
     }
 
@@ -175,4 +175,43 @@ module "scaling_group" {
   scaling_type        = "TargetTrackingScaling"
   cpu_threshold       = 80
   scaling_policy_name = "ai-cpu-demand"
+}
+
+data "aws_secretsmanager_secret" "rds_credentials" {
+  name = "RDS_credentials_task_1"
+}
+
+data "aws_secretsmanager_secret_version" "rds_credentials" {
+  secret_id = data.aws_secretsmanager_secret.rds_credentials.id
+}
+
+locals {
+  rds_credentials = jsondecode(data.aws_secretsmanager_secret_version.rds_credentials.secret_string)
+}
+
+module "database" {
+  source = "./modules/rds"
+
+  private_subnet_ids  = module.vpc.private_subnet_ids
+  vpc_security_groups = [module.database_security.security_group_id]
+
+  db_type = {
+    db_engine  = "postgres"
+    db_class   = "db.t4g.micro"
+    db_version = "16.4"
+  }
+
+  db_storage = {
+    storage_size = 20
+    storage_type = "gp3"
+  }
+
+  db_port       = 5432
+  is_multi_az   = true
+  public_access = false
+  db_user = {
+    db_name       = "thinking_tank"
+    user_name     = local.rds_credentials.user_name
+    user_password = local.rds_credentials.password
+  }
 }
