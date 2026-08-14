@@ -17,7 +17,7 @@ resource "aws_launch_template" "launch_plan" {
   }
 
   lifecycle {
-    create_before_destroy = var.ensure_replacement
+    create_before_destroy = true
   }
 }
 
@@ -39,7 +39,7 @@ resource "aws_autoscaling_group" "scaling_plan" {
   }
 
   lifecycle {
-    create_before_destroy = var.ensure_replacement
+    create_before_destroy = true
 
     ignore_changes = [
       desired_capacity

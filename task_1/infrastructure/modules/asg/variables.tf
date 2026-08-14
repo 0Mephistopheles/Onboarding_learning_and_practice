@@ -26,8 +26,7 @@ variable "subnet_ids" {
 }
 
 variable "device_root" {
-  type    = string
-  default = "/dev/asg"
+  type = string
 }
 
 variable "instance_volume" {
@@ -36,11 +35,6 @@ variable "instance_volume" {
     volume_type           = optional(string, "gp3")
     delete_on_termination = optional(bool, true)
   })
-}
-
-variable "instance_tags" {
-  type    = map(string)
-  default = {}
 }
 
 variable "group_min_size" {
@@ -61,11 +55,6 @@ variable "check_type" {
 
 variable "check_period" {
   type = number
-}
-
-variable "ensure_replacement" {
-  type    = bool
-  default = true
 }
 
 variable "enable_scaling" {

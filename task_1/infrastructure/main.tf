@@ -50,12 +50,21 @@ module "bastion_security" {
 
   rules = {
     ssh = {
-      description        = "ssh conection rule"
+      description        = "ssh connection rule"
       traffic_type       = "ingress"
       source_cidr_blocks = [var.my_ip]
       port_range_start   = 22
       port_range_end     = 22
       protocol_name      = "tcp"
+    }
+
+    outbound = {
+      description        = "allow bastion outbound traffic"
+      traffic_type       = "egress"
+      source_cidr_blocks = ["0.0.0.0/0"]
+      port_range_start   = 0
+      port_range_end     = 0
+      protocol_name      = "-1"
     }
   }
 }
@@ -69,30 +78,48 @@ module "asg_security" {
 
   rules = {
     ssh = {
-      description        = "ssh connection from bastion"
-      traffic_type       = "ingress"
+      description              = "ssh connection from bastion"
+      traffic_type             = "ingress"
       source_security_group_id = module.bastion_security.security_group_id
-      port_range_start   = 22
-      port_range_end     = 22
-      protocol_name      = "tcp"
+      port_range_start         = 22
+      port_range_end           = 22
+      protocol_name            = "tcp"
+    }
+
+    outbound = {
+      description        = "allow bastion outbound traffic"
+      traffic_type       = "egress"
+      source_cidr_blocks = ["0.0.0.0/0"]
+      port_range_start   = 0
+      port_range_end     = 0
+      protocol_name      = "-1"
     }
   }
 }
 
 module "database_security" {
-  source = "./modules/security"
-  name = "database-sg"
+  source      = "./modules/security"
+  name        = "database-sg"
   description = "Database instances security group"
-  vpc_id = module.vpc.vpc_id
+  vpc_id      = module.vpc.vpc_id
 
   rules = {
     ssh = {
-      description = "ssh connection from bastion"
-      traffic_type = "ingress"
+      description              = "ssh conection from bastion"
+      traffic_type             = "ingress"
       source_security_group_id = module.bastion_security.security_group_id
-      port_range_start = 22
-      port_range_end = 22
-      protocol_name = "tcp"
+      port_range_start         = 22
+      port_range_end           = 22
+      protocol_name            = "tcp"
+    }
+
+    outbound = {
+      description        = "allow bastion outbound traffic"
+      traffic_type       = "egress"
+      source_cidr_blocks = ["0.0.0.0/0"]
+      port_range_start   = 0
+      port_range_end     = 0
+      protocol_name      = "-1"
     }
   }
 }
@@ -100,19 +127,52 @@ module "database_security" {
 module "bastion_instance" {
   source = "./modules/ec2_instance"
 
-  subnet_id = module.vpc.public_subnet_ids[0]
-  security_group_ids = [module.bastion_security.security_group_id]
+  subnet_id                   = module.vpc.public_subnet_ids[0]
+  security_group_ids          = [module.bastion_security.security_group_id]
   associate_public_ip_address = true
-  instance_key = "dev_key"
+  instance_key                = "dev_key"
 
   instance_system_type = {
     ami_image_type = "ami-0bdc7d025135d7b49"
-    instance_type = "t3.micro"
+    instance_type  = "t3.micro"
   }
 
   instance_volume = {
-    volume_type = "gp3"
-    volume_size = 8
+    volume_type     = "gp3"
+    volume_size     = 8
     deletion_policy = true
   }
+}
+
+module "scaling_group" {
+  source = "./modules/asg"
+
+  launch_template_name = "ai-processors"
+  group_name           = "ai-processors"
+
+  instance_system_type = {
+    ami_image_type = "ami-0bdc7d025135d7b49"
+    instance_type  = "t3.small"
+  }
+  instance_key = "dev_key"
+
+  instance_volume = {
+    volume_type           = "gp3"
+    volume_size           = 16
+    delete_on_termination = true
+  }
+  security_group_ids = [module.asg_security.security_group_id]
+  subnet_ids         = module.vpc.private_subnet_ids
+  device_root        = "/dev/xvda"
+
+  group_capacity = 1
+  group_min_size = 1
+  group_max_size = 2
+  enable_scaling = true
+
+  check_type          = "EC2"
+  check_period        = 180
+  scaling_type        = "TargetTrackingScaling"
+  cpu_threshold       = 80
+  scaling_policy_name = "ai-cpu-demand"
 }

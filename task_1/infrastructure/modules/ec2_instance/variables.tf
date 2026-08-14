@@ -28,6 +28,6 @@ variable "instance_volume" {
     volume_type       = optional(string, "gp3")
     volume_iops       = optional(number)
     volume_throughput = optional(number)
-    deletion_policy = bool
+    deletion_policy   = bool
   })
 }

@@ -13,3 +13,7 @@ output "launch_template_id" {
 output "launch_template_latest_version" {
   value = aws_launch_template.launch_plan.latest_version
 }
+
+output "autoscaling_group_arn" {
+  value = aws_autoscaling_group.scaling_plan.arn
+}
