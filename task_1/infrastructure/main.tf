@@ -38,7 +38,7 @@ module "routing" {
   public_subnet_ids   = module.vpc.public_subnet_ids
   private_subnet_ids  = module.vpc.private_subnet_ids
 
-  enable_nat = false
+  enable_nat = true
 }
 
 module "bastion_security" {
@@ -214,4 +214,5 @@ module "database" {
     user_name     = local.rds_credentials.user_name
     user_password = local.rds_credentials.password
   }
+  skip_snapshot = true
 }

@@ -44,3 +44,7 @@ variable "public_access" {
   type    = bool
   default = false
 }
+
+variable "skip_snapshot" {
+  type = bool
+}

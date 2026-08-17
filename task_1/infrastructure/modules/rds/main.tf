@@ -14,7 +14,8 @@ resource "aws_db_instance" "database" {
   db_name  = var.db_user.db_name
   username = var.db_user.user_name
   password = var.db_user.user_password
-
+  
+  skip_final_snapshot = var.skip_snapshot
   port                   = var.db_port
   multi_az               = var.is_multi_az
   publicly_accessible    = var.public_access
