@@ -1,25 +1,19 @@
-variable "vpc_cidr" {
-  type = string
-}
+variable "virtual_private_clouds" {
+  type = map(object({
+    vpc_cidr             = string
+    enable_dns_hostnames = optional(bool, false)
+    enable_dns_support   = optional(bool, false)
 
-variable "public_subnet_cidrs" {
-  type = list(string)
-}
+    vpc_subnets = map(object({
+      type              = string
+      subnet_cidr       = string
+      availability_zone = string
+    }))
 
-variable "private_subnet_cidrs" {
-  type = list(string)
-}
-
-variable "availability_zones" {
-  type = list(string)
-}
-
-variable "enable_dns_hostnames" {
-  type    = bool
-  default = false
-}
-
-variable "enable_dns_support" {
-  type    = bool
-  default = false
+    routing_configuration = object({
+      destination_cidr_block = optional(string, "0.0.0.0/0")
+      enable_nat             = optional(bool, false)
+      nat_location_name      = optional(string, "subnet_1")
+    })
+  }))
 }

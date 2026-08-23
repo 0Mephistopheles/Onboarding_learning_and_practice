@@ -21,54 +21,120 @@ provider "aws" {
 module "vpc" {
   source = "./modules/network"
 
-  vpc_cidr             = "10.0.0.0/16"
-  public_subnet_cidrs  = ["10.0.0.0/24", "10.0.1.0/24"]
-  private_subnet_cidrs = ["10.0.2.0/24", "10.0.3.0/24"]
-  availability_zones   = ["us-east-1a", "us-east-1b"]
+  virtual_private_clouds= {
+    vpc_a = {
+      vpc_cidr = "10.0.0.0/16"
+      vpc_subnets = {
+        subnet_1 = {
+          type = "public"
+          subnet_cidr = "10.0.0.0/24"
+          availability_zone = "us-east-1a"
+        }
+        subnet_2 = {
+          type = "public"
+          subnet_cidr = "10.0.1.0/24"
+          availability_zone = "us-east-1b"
+        }
+        subnet_3 = {
+          type = "private"
+          subnet_cidr = "10.0.2.0/24"
+          availability_zone = "us-east-1a"
+        }
+        subnet_4 = {
+          type = "private"
+          subnet_cidr = "10.0.3.0/24"
+          availability_zone = "us-east-1b"
+        }
+      }
 
-  enable_dns_hostnames = true
-  enable_dns_support   = true
-}
-
-module "routing" {
-  source = "./modules/routing"
-
-  vpc_id              = module.vpc.vpc_id
-  internet_gateway_id = module.vpc.internet_gateway_id
-  public_subnet_ids   = module.vpc.public_subnet_ids
-  private_subnet_ids  = module.vpc.private_subnet_ids
-
-  enable_nat = true
-}
-
-module "bastion_security" {
-  source = "./modules/security"
-
-  name        = "bastion-sg"
-  description = "Bastion security group"
-  vpc_id      = module.vpc.vpc_id
-
-  rules = {
-    ssh = {
-      description        = "ssh connection rule"
-      traffic_type       = "ingress"
-      source_cidr_blocks = [var.my_ip]
-      port_range_start   = 22
-      port_range_end     = 22
-      protocol_name      = "tcp"
-    }
-
-    outbound = {
-      description        = "allow bastion outbound traffic"
-      traffic_type       = "egress"
-      source_cidr_blocks = ["0.0.0.0/0"]
-      port_range_start   = 0
-      port_range_end     = 0
-      protocol_name      = "-1"
+      routing_configuration = {
+        destination_cidr_block = "0.0.0.0/0"
+        enable_nat = true
+        nat_location_name = "subnet_1"
+      }
     }
   }
 }
 
+module "security_groups" {
+  source = "./modules/security"
+  vpc_id = module.vpc.vpc_ids["vpc_a"]
+
+  security_groups = {
+    bastion_security = {
+      group_description = "Bastion security rules"
+
+      rules = {
+        ssh = {
+          description        = "ssh connection rule"
+          traffic_type       = "ingress"
+          source_cidr_blocks = [var.my_ip]
+          port_range_start   = 22
+          port_range_end     = 22
+          protocol_name      = "tcp"
+        }
+
+        outbound = {
+          description        = "allow bastion outbound traffic"
+          traffic_type       = "egress"
+          source_cidr_blocks = ["0.0.0.0/0"]
+          port_range_start   = 0
+          port_range_end     = 0
+          protocol_name      = "-1"
+        }
+      }
+    }
+
+    asg_security = {
+      group_description = "Auto scalling group security rules"
+
+      rules = {
+        ssh = {
+          description              = "ssh connection from bastion"
+          traffic_type             = "ingress"
+          source_security_group_id = "bastion_security"
+          port_range_start         = 22
+          port_range_end           = 22
+          protocol_name            = "tcp"
+        }
+
+        outbound = {
+          description        = "allow bastion outbound traffic"
+          traffic_type       = "egress"
+          source_cidr_blocks = ["0.0.0.0/0"]
+          port_range_start   = 0
+          port_range_end     = 0
+          protocol_name      = "-1"
+        }
+      }
+    }
+
+    database_security = {
+      group_description = "Database instances security group"
+
+      rules = {
+        postgres = {
+          description              = "postgres conection from asg"
+          traffic_type             = "ingress"
+          source_security_group_id = "asg_security"
+          port_range_start         = 5432
+          port_range_end           = 5432
+          protocol_name            = "tcp"
+        }
+
+        outbound = {
+          description        = "allow bastion outbound traffic"
+          traffic_type       = "egress"
+          source_cidr_blocks = ["0.0.0.0/0"]
+          port_range_start   = 0
+          port_range_end     = 0
+          protocol_name      = "-1"
+        }
+      }
+    }
+  }
+}
+/*
 module "asg_security" {
   source = "./modules/security"
 
@@ -76,25 +142,7 @@ module "asg_security" {
   description = "Auto scalling group security rules"
   vpc_id      = module.vpc.vpc_id
 
-  rules = {
-    ssh = {
-      description              = "ssh connection from bastion"
-      traffic_type             = "ingress"
-      source_security_group_id = module.bastion_security.security_group_id
-      port_range_start         = 22
-      port_range_end           = 22
-      protocol_name            = "tcp"
-    }
-
-    outbound = {
-      description        = "allow bastion outbound traffic"
-      traffic_type       = "egress"
-      source_cidr_blocks = ["0.0.0.0/0"]
-      port_range_start   = 0
-      port_range_end     = 0
-      protocol_name      = "-1"
-    }
-  }
+  
 }
 
 module "database_security" {
@@ -103,25 +151,7 @@ module "database_security" {
   description = "Database instances security group"
   vpc_id      = module.vpc.vpc_id
 
-  rules = {
-    postgres = {
-      description              = "postgres conection from asg"
-      traffic_type             = "ingress"
-      source_security_group_id = module.asg_security.security_group_id
-      port_range_start         = 5432
-      port_range_end           = 5432
-      protocol_name            = "tcp"
-    }
-
-    outbound = {
-      description        = "allow bastion outbound traffic"
-      traffic_type       = "egress"
-      source_cidr_blocks = ["0.0.0.0/0"]
-      port_range_start   = 0
-      port_range_end     = 0
-      protocol_name      = "-1"
-    }
-  }
+  
 }
 
 module "bastion_instance" {
@@ -216,3 +246,4 @@ module "database" {
   }
   skip_snapshot = true
 }
+*/
