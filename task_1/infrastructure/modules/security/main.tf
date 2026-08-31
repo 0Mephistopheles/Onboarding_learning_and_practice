@@ -26,11 +26,15 @@ resource "aws_security_group_rule" "traffic_rules" {
   for_each          = local.packed_rules
   security_group_id = aws_security_group.guard[each.value.group_name].id
 
-  type                     = each.value.rule.traffic_type
-  description              = each.value.rule.description
-  cidr_blocks              = each.value.rule.source_cidr_blocks
-  source_security_group_id = each.value.rule.source_security_group_id
-  protocol                 = each.value.rule.protocol_name
-  from_port                = each.value.rule.port_range_start
-  to_port                  = each.value.rule.port_range_end
+  type        = each.value.rule.traffic_type
+  description = each.value.rule.description
+  cidr_blocks = each.value.rule.source_cidr_blocks
+  source_security_group_id = try(
+    aws_security_group.guard[
+      each.value.rule.source_security_group_id
+    ].id,
+  null)
+  protocol  = each.value.rule.protocol_name
+  from_port = each.value.rule.port_range_start
+  to_port   = each.value.rule.port_range_end
 }

@@ -2,3 +2,4 @@
 *terraform.tfstate*
 *terraform.lock*
 *.tfvars
+**/group_vars/all.yml
