@@ -73,3 +73,7 @@ variable "scaling_type" {
 variable "cpu_threshold" {
   type = number
 }
+
+variable "target_group_arns" {
+  type = list(string)
+}
