@@ -32,21 +32,13 @@ jobs:
       - name: Login to ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build llama image
-        run: |
-          docker build -t $ECR_REGISTRY/practice/llama:latest task_3/dockerfiles/Llama
-
-      - name: Push llama image
-        run: |
-          docker push $ECR_REGISTRY/practice/llama:latest
-
       - name: Build webui image
         run: |
-          docker build -t $ECR_REGISTRY/practice/open-webui:latest task_3/dockerfiles/WebUI
+          docker build -t $ECR_REGISTRY/practice/webui:latest task_3/dockerfiles/WebUI
 
       - name: Push webui image
         run: |
-          docker push $ECR_REGISTRY/practice/open-webui:latest
+          docker push $ECR_REGISTRY/practice/webui:latest
 
       - name: Build prometheus image
         run: |
