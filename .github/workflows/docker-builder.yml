@@ -34,7 +34,7 @@ jobs:
 
       - name: Build llama image
         run: |
-          docker build -t $ECR_REGISTRY/practice/llama:latest task_1/dockerfiles/Llama
+          docker build -t $ECR_REGISTRY/practice/llama:latest task_3/dockerfiles/Llama
 
       - name: Push llama image
         run: |
@@ -42,7 +42,7 @@ jobs:
 
       - name: Build webui image
         run: |
-          docker build -t $ECR_REGISTRY/practice/open-webui:latest task_1/dockerfiles/WebUI
+          docker build -t $ECR_REGISTRY/practice/open-webui:latest task_3/dockerfiles/WebUI
 
       - name: Push webui image
         run: |
@@ -50,7 +50,7 @@ jobs:
 
       - name: Build prometheus image
         run: |
-          docker build -t $ECR_REGISTRY/practice/prometheus:latest task_1/dockerfiles/Prometheus
+          docker build -t $ECR_REGISTRY/practice/prometheus:latest task_3/dockerfiles/Prometheus
 
       - name: Push prometheus image
         run: |
@@ -58,7 +58,7 @@ jobs:
 
       - name: Build grafana image
         run: |
-          docker build -t $ECR_REGISTRY/practice/grafana:latest task_1/dockerfiles/Grafana
+          docker build -t $ECR_REGISTRY/practice/grafana:latest task_3/dockerfiles/Grafana
 
       - name: Push grafana image
         run: |
