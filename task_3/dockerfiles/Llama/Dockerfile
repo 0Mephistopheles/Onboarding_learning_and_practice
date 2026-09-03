@@ -27,6 +27,3 @@ COPY --from=builder /models/tinyllama.gguf /tinyllama_app/model/tinyllama.gguf
 WORKDIR /tinyllama_app
 
 CMD ["llama-server", "-m", "/tinyllama_app/model/tinyllama.gguf", "--host", "0.0.0.0", "--port", "8080"]
-
-
-
