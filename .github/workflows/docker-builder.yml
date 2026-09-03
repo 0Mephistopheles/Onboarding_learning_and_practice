@@ -12,7 +12,6 @@ permissions:
   contents: read
 
 env:
-  AWS_REGION: us-east-1
   ECR_REGISTRY: ${{secrets.AWS_ARN}}.dkr.ecr.us-east-1.amazonaws.com
 
 jobs:
@@ -22,6 +21,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Get aws access
         uses: aws-actions/configure-aws-credentials@v4
@@ -32,34 +33,8 @@ jobs:
       - name: Login to ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build llama image
+      - name: Check commit effect
         run: |
-          docker build -t $ECR_REGISTRY/practice/llama:latest task_3/dockerfiles/Llama
-
-      - name: Push llama image
-        run: |
-          docker push $ECR_REGISTRY/practice/llama:latest
-
-      - name: Build webui image
-        run: |
-          docker build -t $ECR_REGISTRY/practice/webui:latest task_3/dockerfiles/WebUI
-
-      - name: Push webui image
-        run: |
-          docker push $ECR_REGISTRY/practice/webui:latest
-
-      - name: Build prometheus image
-        run: |
-          docker build -t $ECR_REGISTRY/practice/prometheus:latest task_3/dockerfiles/Prometheus
-
-      - name: Push prometheus image
-        run: |
-          docker push $ECR_REGISTRY/practice/prometheus:latest
-
-      - name: Build grafana image
-        run: |
-          docker build -t $ECR_REGISTRY/practice/grafana:latest task_3/dockerfiles/Grafana
-
-      - name: Push grafana image
-        run: |
-          docker push $ECR_REGISTRY/practice/grafana:latest
+          CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^task_3/dockerfiles/' | cut -d/ -f1-3)
+          
+          echo "$CHANGED_DOCKERFILES"
