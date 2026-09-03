@@ -5,7 +5,6 @@ on:
       - development
     paths:
       - "task_3/dockerfiles/**"
-      - ".github/workflows/docker-builder.yml"
 
 permissions:
   id-token: write
@@ -35,6 +34,13 @@ jobs:
 
       - name: Check commit effect
         run: |
-          CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^task_3/dockerfiles/' | cut -d/ -f1-3 | sort -u)
-          
-          echo "$CHANGED_DOCKERFILES"
+          CHANGED_DOCKERFILES=$(git diff --name-only "${{github.event.before}}" "${{github.sha}}" | grep '^task_3/dockerfiles/' | cut -d/ -f3 | sort -u)
+          echo "IMAGES_LIST=$CHANGED_DOCKERFILES" >> "$GITHUB_ENV"
+
+      - name: Build and push modified images
+        run: |
+          for image in $IMAGES_LIST; do
+            echo "Cooking la $image"
+            docker build -t "$ECR_REGISTRY/practice/${image,,}:latest" "task_3/dockerfiles/$image"  &&
+            docker push "$ECR_REGISTRY/practice/${image,,}:latest" && echo "La $image est pret"
+          done
