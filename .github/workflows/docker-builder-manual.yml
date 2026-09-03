@@ -1,0 +1,64 @@
+name: Build and Push Docker Images
+on:
+  workflow_dispatch:
+
+
+permissions:
+  id-token: write
+  contents: read
+
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{secrets.AWS_ARN}}.dkr.ecr.us-east-1.amazonaws.com
+
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-24.04
+
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+
+      - name: Get aws access
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{secrets.AWS_ARN}}:role/Actions-ECR
+          aws-region: us-east-1
+
+
+      - name: Login to ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+
+      - name: Build webui image
+        run: |
+          docker build -t $ECR_REGISTRY/practice/webui:latest task_3/dockerfiles/WebUI
+
+
+      - name: Push webui image
+        run: |
+          docker push $ECR_REGISTRY/practice/webui:latest
+
+
+      - name: Build prometheus image
+        run: |
+          docker build -t $ECR_REGISTRY/practice/prometheus:latest task_3/dockerfiles/Prometheus
+
+
+      - name: Push prometheus image
+        run: |
+          docker push $ECR_REGISTRY/practice/prometheus:latest
+
+
+      - name: Build grafana image
+        run: |
+          docker build -t $ECR_REGISTRY/practice/grafana:latest task_3/dockerfiles/Grafana
+
+
+      - name: Push grafana image
+        run: |
+          docker push $ECR_REGISTRY/practice/grafana:latest
