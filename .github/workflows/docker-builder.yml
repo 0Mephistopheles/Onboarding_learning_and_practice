@@ -35,6 +35,6 @@ jobs:
 
       - name: Check commit effect
         run: |
-          CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^task_3/dockerfiles/' | cut -d/ -f1-3)
+          CHANGED_DOCKERFILES=$(git diff --name-only HEAD^ HEAD | grep '^task_3/dockerfiles/' | cut -d/ -f1-3 | sort -u)
           
           echo "$CHANGED_DOCKERFILES"
