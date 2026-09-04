@@ -1,7 +1,9 @@
 name: Build and push docker images
 on:
   workflow_dispatch:
-
+    branches:
+      - development
+      
 permissions:
   id-token: write
   contents: read
