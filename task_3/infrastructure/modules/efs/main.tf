@@ -1,13 +1,13 @@
 resource "aws_efs_file_system" "volume_system" {
-    creation_token = var.efs_volume.volume_token
-    encrypted = var.efs_volume.is_encrypted
+  creation_token = var.efs_volume.volume_token
+  encrypted      = var.efs_volume.is_encrypted
 }
 
 resource "aws_efs_mount_target" "volume_mount" {
   for_each = var.efs_volume.mount_targets
-  
-  file_system_id = aws_efs_file_system.volume_system.id
-  subnet_id = each.value.subnet_id
+
+  file_system_id  = aws_efs_file_system.volume_system.id
+  subnet_id       = each.value.subnet_id
   security_groups = each.value.security_groups
 }
 
@@ -25,8 +25,8 @@ resource "aws_efs_access_point" "volume_access" {
 
     creation_info {
       permissions = each.value.root_directory.permissions
-      owner_gid = each.value.root_directory.owner_gid
-      owner_uid = each.value.root_directory.owner_uid
+      owner_gid   = each.value.root_directory.owner_gid
+      owner_uid   = each.value.root_directory.owner_uid
     }
   }
 }

@@ -1,7 +1,7 @@
 variable "efs_volume" {
   type = object({
-    volume_token  = string
-    is_encrypted  = optional(bool, true)
+    volume_token = string
+    is_encrypted = optional(bool, true)
 
     mount_targets = map(object({
       subnet_id       = string
