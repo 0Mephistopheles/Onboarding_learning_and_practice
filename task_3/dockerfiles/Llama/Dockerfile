@@ -1,6 +1,6 @@
 FROM debian:stable-slim AS builder
 
-RUN apt-get update && apt-get install -y build-essential cmake git wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y build-essential cmake git wget libgomp1 curl && rm -rf /var/lib/apt/lists/*
 
 RUN git clone https://github.com/ggml-org/llama.cpp.git /src
 
@@ -12,7 +12,7 @@ RUN mkdir -p /models && wget -O /models/tinyllama.gguf "https://huggingface.co/t
 
 FROM debian:stable-slim
 
-RUN apt-get update && apt-get install -y libgomp1 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libgomp1 curl && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /src/build/bin/ /usr/local/bin/
 
