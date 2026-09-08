@@ -4,7 +4,18 @@ global:
 
 scrape_configs:
   - job_name: "prometheus"
-
     static_configs:
       - targets:
           - "localhost:9090"
+
+  - job_name: "llama"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "llama.ecs.local:8080"
+
+  - job_name: "grafana"
+    metrics_path: "/metrics"
+    static_configs:
+      - targets:
+          - "grafana.ecs.local:3000"
