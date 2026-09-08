@@ -35,11 +35,8 @@ jobs:
       - name: Check commit effect
         run: |
           CHANGED_DOCKERFILES=$(git diff --name-only "${{github.event.before}}" "${{github.sha}}" | grep '^task_3/dockerfiles/' | cut -d/ -f3 | sort -u)
-          echo "IMAGES_LIST=$CHANGED_DOCKERFILES" >> "$GITHUB_ENV"
-
-      - name: Build and push modified images
-        run: |
-          for image in $IMAGES_LIST; do
+          
+          for image in $CHANGED_DOCKERFILES; do
             echo "Cooking la $image"
             docker build -t "$ECR_REGISTRY/practice/${image,,}:${{github.run_number}}" "task_3/dockerfiles/$image"  &&
             docker push "$ECR_REGISTRY/practice/${image,,}:${{github.run_number}}" && echo "La $image est pret"
