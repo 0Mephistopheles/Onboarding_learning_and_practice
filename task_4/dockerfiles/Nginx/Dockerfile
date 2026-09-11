@@ -1,6 +1,6 @@
 FROM debian:bookworm-slim
 
-RUN apt-get update && apt-get install -y --no-install-recommends nginx && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends nginx curl && rm -rf /var/lib/apt/lists/*
 
 RUN rm /etc/nginx/sites-enabled/default
 
