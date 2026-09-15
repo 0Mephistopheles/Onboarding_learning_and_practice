@@ -12,6 +12,8 @@ WORKDIR /opt/keycloak
 
 RUN /opt/keycloak/bin/kc.sh build
 
+COPY autho_realm.json.json /opt/keycloak/data/import/autho_realm.json.json
+
 EXPOSE 8080 9000
 
 USER 1000
