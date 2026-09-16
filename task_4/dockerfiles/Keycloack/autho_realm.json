@@ -9,10 +9,10 @@
       "publicClient": false,
       "secret": "{KEYCLOAK_CLIENT_SECRET}",
       "redirectUris": [
-        "http://llama-balancer-1707117359.us-east-1.elb.amazonaws.com/oauth2/keycloak/callback"
+        "http://llama-balancer-994592497.us-east-1.elb.amazonaws.com/oauth2/keycloak/callback"
       ],
       "webOrigins": [
-        "http://llama-balancer-1707117359.us-east-1.elb.amazonaws.com"
+        "http://llama-balancer-994592497.us-east-1.elb.amazonaws.com"
       ],
       "standardFlowEnabled": true
     }
