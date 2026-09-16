@@ -3,7 +3,7 @@
   "enabled": true,
   "clients": [
     {
-      "clientId": "oauth2-keycloack",
+      "clientId": "oauth2-keycloak",
       "enabled": true,
       "protocol": "openid-connect",
       "publicClient": false,
