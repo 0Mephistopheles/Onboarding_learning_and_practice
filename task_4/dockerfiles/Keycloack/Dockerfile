@@ -10,6 +10,8 @@ WORKDIR /opt/keycloak
 
 EXPOSE 8080 9000
 
+RUN chown -R 1000:1000 /opt/keycloak
+
 USER 1000
 
 ENTRYPOINT ["/opt/keycloak/bin/kc.sh"]
