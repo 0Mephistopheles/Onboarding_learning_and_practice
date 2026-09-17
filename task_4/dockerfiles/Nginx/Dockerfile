@@ -8,8 +8,6 @@ COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 COPY html/login /var/www/html/login
 
-RUN nginx -t
-
 EXPOSE 8080
 
 CMD ["nginx", "-g", "daemon off;"]
