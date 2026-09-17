@@ -6,7 +6,9 @@ RUN rm /etc/nginx/sites-enabled/default
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
-COPY html/ /var/www/html/
+COPY html/login /var/www/html/login
+
+RUN nginx -t
 
 EXPOSE 8080
 
